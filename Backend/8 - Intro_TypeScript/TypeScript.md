@@ -134,3 +134,29 @@ A melhor prática de utilização do **Typescript** em um projeto é instalá-lo
 
 Para instalar o compilador TypeScript no seu projeto execute:
 
+```
+## Comando para instalar a dependência do typescript na node_modules do seu projeto
+npm i -D -E typescript@4.4.4
+```
+
+Podemos gerar o código JavaScript de um arquivo TypeScript da seguinte forma:
+
+```
+npx tsc nomeDoArquivo.ts
+```
+
+OU caso tenha instalado globalmente:
+
+```
+tsc nomeDoArquivo.ts
+```
+**Obs**: A extensão **.ts** é a extensão padrão para os arquivos **TypeScript**.
+
+Ao rodarmos esse comando, será verificado o conteúdo do arquivo *nomeDoArquivo.ts* e, caso nenhum problema seja encontrado, um novo arquivo será criado com o nome *nomeDoArquivo.js* e contendo o código compilado para **JavaScript**. A seguir, podemos rodar o arquivo **.js** gerado utilizando o *Node*. Caso haja erro, o compilador apontará uma mensagem de erro no terminal e o arquivo **.js** não será gerado.
+
+Para rodar o arquivo gerado utilizando o *Node*:
+
+```
+node nomeDoArquivo.js
+```
+
