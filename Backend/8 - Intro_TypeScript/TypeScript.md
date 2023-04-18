@@ -120,5 +120,17 @@ No entanto, o **Typescript** possui um Compilador denominado **TSC (TypeScript C
 
 ![transpilador](https://content-assets.betrybe.com/prod/Imagem%20que%20demonstra%20a%20diferen%C3%A7a%20entre%20compilador%20e%20transpilador.png)
 
+# TSC - TypeScript Compiler
 
+O **TSC** é o responsável por realizar a tradução do nosso código **TypeScript** para código **JavaScript**.
+
+Lembra que nas seções anteriores nós estudamos a tipagem em linguagens de programação e descobrimos que o **TypeScript** é uma linguagem estaticamente tipada e fortemente tipada? O TSC também é o responsável por realizar a verificação de tipo no nosso código TypeScript. Veremos como isso funciona.
+
+Para isso, podemos instalar o **TSC** e o suporte ao **TypeScript** em nossa máquina. Há duas maneiras de instalar o **TSC**: localmente e globalmente. Esta última não é recomendável, pois fixa a versão do TypeScript em todos os projetos em que for utilizado.
+
+Obs: para instalar o TSC globalmente basta executar o comando *npm install -g -E typescript@4.4.4.*
+
+A melhor prática de utilização do **Typescript** em um projeto é instalá-lo como uma *devDependency* e utilizá-lo por meio do comando *npx*. Isso garante que toda vez que o projeto for compilado, será utilizada a mesma versão do TypeScript definida no *package.json*, e não a versão global instalada, que pode variar conforme o ambiente.
+
+Para instalar o compilador TypeScript no seu projeto execute:
 
