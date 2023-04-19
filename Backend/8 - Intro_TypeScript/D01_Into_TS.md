@@ -463,3 +463,186 @@ export function getRectangleArea(base: number, height: number): number {
 }
 
 ```
+A terceira calculará a área de um triângulo. A fórmula consiste em multiplicar a medida da base pela medida da altura e dividir o resultado pela metade. (A = (b * h) / 2)
+
+![traingulo](https://content-assets.betrybe.com/prod/846a1764-9dbe-4b7e-b79c-a6961c6a839c-%C3%81rea%20do%20tri%C3%A2ngulo.png)
+
+```javascript
+// ./exercises.ts
+
+// export function getSquareArea(side: number): number {
+//   return side ** 2;
+// }
+
+// export function getRectangleArea(base: number, height: number): number {
+//   return base * height;
+// }
+
+export function getTriangleArea(base: number, height: number): number {
+  return (base * height) / 2;
+}
+
+```
+Já a quarta função, será responsável por calcular o perímetro de um polígono. Um polígono é uma forma geométrica fechada que possui lados retos. Por exemplo: triângulos, retângulos, quadrados, trapézios, hexágonos, entre outros. A fórmula para o cálculo consiste em somar a medida de todos os lados. (P = a + b + c + d + e + f ...)
+
+![poligono](https://content-assets.betrybe.com/prod/846a1764-9dbe-4b7e-b79c-a6961c6a839c-Per%C3%ADmetro%20de%20um%20pol%C3%ADgono.png)
+
+```javascript
+// ./exercises.ts
+
+// export function getSquareArea(side: number): number {
+//   return side ** 2;
+// }
+
+// export function getRectangleArea(base: number, height: number): number {
+//   return base * height;
+// }
+
+// export function getTriangleArea(base: number, height: number): number {
+//   return (base * height) / 2;
+// }
+
+export function getPolygonPerimeter(sides: number[]): number {
+  return sides.reduce((acc, side) => acc + side, 0);
+}
+
+```
+
+Para termos um exemplo com retorno de tipos diferentes. Nossa última função será responsável por verificar se um **triângulo é válido** com base na medida de seus lados e deve retornar um valor booleano (true ou false). Para que um triângulo exista, um de seus lados deve ser maior que a diferença absoluta entre os outros dois e menor que a soma deles. Caso queira entender melhor, consulte este artigo do Mundo Educação.
+
+```javascript
+// ./exercises.ts
+
+// export function getSquareArea(side: number): number {
+//   return side ** 2;
+// }
+
+// export function getRectangleArea(base: number, height: number): number {
+//   return base * height;
+// }
+
+// export function getTriangleArea(base: number, height: number): number {
+//   return (base * height) / 2;
+// }
+
+// export function getPolygonPerimeter(sides: number[]): number {
+//   return sides.reduce((acc, side) => acc + side, 0);
+// }
+
+export function triangleCheck(
+  sideA: number,
+  sideB: number,
+  sideC: number
+): boolean {
+  const checkSideA = (sideB - sideC) < sideA && sideA < (sideB + sideC);
+  const checkSideB = (sideA - sideC) < sideB && sideB < (sideA + sideC);
+  const checkSideC = (sideA - sideB) < sideC && sideC < (sideA + sideB);
+  return checkSideA && checkSideB && checkSideC;
+}
+
+```
+
+### Utilizando as funções
+
+Pronto. Agora, vamos fazer algumas chamadas a este módulo no arquivo index.ts.
+
+```javascript
+// ./index.ts
+
+import * as Ex from './exercises';
+
+console.log("A ÁREA DE UM:");
+
+console.log(`- Quadrado de lado 10cm: ${Ex.getSquareArea(10)}cm²`);
+console.log(`- Quadrado de lado 5cm: ${Ex.getSquareArea(5)}cm²`);
+console.log(`- Quadrado de lado 100cm: ${Ex.getSquareArea(100)}cm²`);
+
+console.log(`- Retângulo de base 10cm e altura 25cm: ${Ex.getRectangleArea(10, 25)}cm²`);
+console.log(`- Retângulo de base 5cm e altura 30cm: ${Ex.getRectangleArea(5, 30)}cm²`);
+console.log(`- Retângulo de base 200cm e altura 100cm: ${Ex.getRectangleArea(200, 100)}cm²`);
+
+console.log(`- Triângulo de base 10cm e altura 25cm: ${Ex.getTriangleArea(10, 25)}cm²`);
+console.log(`- Triângulo de base 5cm e altura 30cm: ${Ex.getTriangleArea(5, 30)}cm²`);
+console.log(`- Triângulo de base 100cm e altura 200cm: ${Ex.getTriangleArea(100, 200)}cm²`);
+
+console.log("\nO PERÍMETRO DE UM:");
+
+console.log(`- Quadrado de lado 10cm: ${Ex.getPolygonPerimeter([10, 10, 10, 10])}cm`);
+console.log(`- Retângulo de base 10cm e altura 25cm: ${Ex.getPolygonPerimeter([10, 25, 10, 25])}cm`);
+console.log(`- Triângulo cujos lados tem 10cm cada: ${Ex.getPolygonPerimeter([10, 10, 10])}cm`);
+
+console.log("\nVERIFICA A EXISTÊNCIA DE TRIÂNGULOS CUJOS LADOS TÊM:");
+
+console.log(`- 10cm, 5cm e 3cm: ${Ex.triangleCheck(10, 5, 3)}`);
+console.log(`- 10cm, 5cm e 3cm: ${Ex.triangleCheck(10, 5, 8)}`);
+console.log(`- 10cm, 5cm e 3cm: ${Ex.triangleCheck(30, 30, 30)}`);
+
+```
+
+Em seguida, vamos compilar o nosso programa:
+
+```zsh
+npx tsc
+
+```
+
+Nossos arquivos **JavaScript** foram gerados dentro do diretório (dist). Agora, basta rodar o nosso programa compilado utilizando o **Node**.
+
+```zsh
+node ./dist/index.js
+
+```
+
+A saída esperada é:
+
+```
+A ÁREA DE UM:
+- Quadrado de lado 10cm: 100cm²
+- Quadrado de lado 5cm: 25cm²
+- Quadrado de lado 100cm: 10000cm²
+- Retângulo de base 10cm e altura 25cm: 250cm² 
+- Retângulo de base 5cm e altura 30cm: 150cm²
+- Retângulo de base 200cm e altura 100cm: 20000cm² 
+- Triângulo de base 10cm e altura 25cm: 125cm²
+- Triângulo de base 5cm e altura 30cm: 75cm²
+- Triângulo de base 100cm e altura 200cm: 10000cm²
+
+O PERÍMETRO DE UM:
+- Quadrado de lado 10cm: 40cm
+- Retângulo de base 10cm e altura 25cm: 70cm
+- Triângulo cujos lados tem 10cm cada: 30cm 
+
+VERIFICA A EXISTÊNCIA DE TRIÂNGULOS CUJOS LADOS TÊM:
+- 10cm, 5cm e 3cm: false
+- 10cm, 5cm e 3cm: true 
+- 10cm, 5cm e 3cm: true 
+
+```
+
+## Para fixar
+
+E agora, o que acha de colocar a mão na massa e incrementar mais esse nosso módulo de cálculo de área de figuras geométricas?
+
+1 - Crie uma nova função para calcular a área de um losango. A área do losango é dada pelo resultado da multiplicação da diagonal maior (D) pela diagonal menor (d) dividido por dois. (A = (D * d) / 2)
+
+![losango](https://content-assets.betrybe.com/prod/8d8210c9-f4e8-4697-95b7-19b673037fa6-%C3%81rea%20do%20Losango.png)
+
+- Calcule a área de um losango que tem D = 32cm e d = 18cm;
+- Calcule a área de um losango que tem D = 200cm e d = 50cm;
+- Calcule a área de um losango que tem D = 75cm e d = 25cm.
+
+2 - Crie uma nova função para calcular a área de um trapézio. A área do trapézio é dada pelo produto da altura (h) com a soma da base maior (B) e a base menor (b) dividido por dois. (A = [(B + b) * h] / 2)
+
+![trapezio](https://content-assets.betrybe.com/prod/8d8210c9-f4e8-4697-95b7-19b673037fa6-%C3%81rea%20do%20Trap%C3%A9zio.png)
+
+- Calcule a área de um trapézio que tem B = 100cm, b = 70cm e altura = 50cm;
+- Calcule a área de um trapézio que tem B = 75cm, b = 50cm e altura = 35cm;
+- Calcule a área de um trapézio que tem B = 150cm, b = 120cm e altura = 80cm.
+
+3 - Crie uma nova função para calcular a área de um círculo. A área do círculo de raio (r) é calculada multiplicando o raio ao quadrado pelo número irracional ℼ (em geral utilizamos ℼ = 3,14). (A = ℼ * r²). Dica: você pode acessar o valor de ℼ utilizando o módulo nativo (Math.PI).
+
+![circulo](https://content-assets.betrybe.com/prod/8d8210c9-f4e8-4697-95b7-19b673037fa6-%C3%81rea%20do%20C%C3%ADrculo.png)
+
+- Calcule a área de um círculo de raio igual 25cm;
+- Calcule a área de um círculo de raio igual 100cm;
+- Calcule a área de um círculo de raio igual 12,5cm.
