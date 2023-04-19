@@ -135,20 +135,20 @@ A melhor prática de utilização do **Typescript** em um projeto é instalá-lo
 
 Para instalar o compilador TypeScript no seu projeto execute:
 
-```
+```zsh
 ## Comando para instalar a dependência do typescript na node_modules do seu projeto
 npm i -D -E typescript@4.4.4
 ```
 
 Podemos gerar o código JavaScript de um arquivo TypeScript da seguinte forma:
 
-```
+```zsh
 npx tsc nomeDoArquivo.ts
 ```
 
 OU caso tenha instalado globalmente:
 
-```
+```zsh
 tsc nomeDoArquivo.ts
 ```
 **Obs**: A extensão **.ts** é a extensão padrão para os arquivos **TypeScript**.
@@ -157,7 +157,7 @@ Ao rodarmos esse comando, será verificado o conteúdo do arquivo *nomeDoArquivo
 
 Para rodar o arquivo gerado utilizando o *Node*:
 
-```
+```zsh
 node nomeDoArquivo.js
 ```
 # Introdução ao TSConfig
@@ -174,19 +174,19 @@ Entre em um diretório vazio de sua escolha e execute um dos seguintes comandos 
 
 Caso tenha instalado o compilador globalmente em sua máquina:
 
-```
+```zsh
 tsc --init
 ```
 
 OU caso queira utilizar o *tsc* como um executável npx:
 
-```
+```zsh
 npx tsc --init
 ```
 
 Um arquivo tsconfig.json será gerado no diretório com o seguinte conteúdo:
 
-```
+```javascript
 {
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
@@ -239,13 +239,13 @@ Também podemos utilizar uma configuração base para o ambiente **JavaScript** 
 
 Por exemplo, se estivermos desenvolvendo um projeto que usará a versão 16 do *Node*, podemos utilizar o módulo base *@typescript/node16*.
 
-```
+```zsh
 npm i -D -E @tsconfig/node16@1.0.3
 ```
 
 Então o *tsconfig.json* ficaria parecido com isso:
 
-```
+```javascript
 {
   "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
@@ -304,7 +304,7 @@ Hoje nós vamos focar em alguns dos tipos primitivos, que são os tipos (boolean
 
 **boolean**: recebe verdadeiro (true) ou falso (false)
 
-```
+```javascript
 let yes: boolean = true; // cria uma variável de nome "yes" e diz que o tipo é booleano e o valor é true
 let no: boolean = false; // cria uma variável de nome "no" e diz que o tipo é booleano e o valor é false
 
@@ -312,7 +312,7 @@ let no: boolean = false; // cria uma variável de nome "no" e diz que o tipo é 
 
 **number**: recebe valores numéricos e, assim como no JavaScript, todos são valores de ponto flutuante.
 
-```
+```javascript
 // cria uma variável de nome "x" e diz que o tipo é number mas não seta o valor
 // isso não funciona com const
 let x: number;
@@ -324,7 +324,7 @@ let z: number = 123.456;
 
 **string**: recebe uma sequência de caracteres armazenados como unidades de código UTF-16 Unicode.
 
-```
+```javascript
 let s: string;
 let empty: string = "";
 let abc: string = 'abc';
@@ -333,7 +333,7 @@ let abc: string = 'abc';
 
 **void**: existe apenas para indicar a ausência de um valor, como em uma função sem valor retornado.
 
-```
+```javascript
 function sayHelloWorld(): void {
   console.log("Hello World!");
 }
@@ -342,7 +342,7 @@ function sayHelloWorld(): void {
 
 **null** e **undefined**: são subtipos de todos os outros tipos.
 
-```
+```javascript
 let nullValue = null;
 let undefinedValue = undefined;
 
@@ -352,7 +352,7 @@ let undefinedValue = undefined;
 
 Como visto anteriormente, podemos utilizar a inferência de tipo no **TypeScript**. É possível declarar uma variável sem especificarmos explicitamente o tipo e o compilador fará a inferência do tipo por meio do valor definido para a variável. Vamos verificar isso no site do *Playground TypeScript*. Após digitar o código abaixo, clique no botão (Run) e, ao término da execução, será exibido o resultado na guia (Logs).
 
-```
+```javascript
 let flag = true; // o compilador irá inferir o tipo boolean
 console.log('O tipo de "flag" é:', typeof flag);
 
@@ -368,3 +368,98 @@ A imagem abaixo apresenta o resultado esperado.
 
 ![log_playground](https://content-assets.betrybe.com/prod/c7ac3605-f5ee-4669-a00b-6d1051e9d607-Verifica%C3%A7%C3%A3o%20de%20tipos%20no%20site%20TypeScript%20Playground.png)
 
+## Primeiro programa em TypeScript
+
+Agora, escreveremos nosso primeiro programa utilizando o **TypeScript**. Criaremos um módulo para calcular as áreas e perímetros de figuras geométricas.
+
+**Obs**: No final da página, há um vídeo resumindo o que vimos até agora e demonstrando, na prática, algumas funcionalidades.
+
+## Configuração
+
+Crie um diretório chamado (exercises). Nele, vamos inicializar nosso projeto **TypeScript**.
+
+```zsh
+mkdir exercises && cd exercises
+
+```
+
+A seguir, vamos inicializar nosso projeto **Node**, instalar o TypeScript, o módulo (npm) com a configuração base do TSConfig para o Node 16 (ou superior) e criar nosso (tsconfig.json).
+
+```zsh
+npm init -y
+
+```
+
+```zsh
+npm install -D -E typescript@4.4.4 @tsconfig/node16@1.0
+
+```
+
+```zsh
+touch tsconfig.json
+
+```
+
+```javascript
+// ./tsconfig.json
+{
+  "extends": "@tsconfig/node16/tsconfig.json",
+  "compilerOptions": {
+    "target": "es2016",                                 
+    "module": "commonjs",
+    "rootDir": "./",
+    "outDir": "./dist",
+    "preserveConstEnums": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  }
+}
+
+```
+
+Por fim, vamos instalar o pacote (npm) com as definições de tipos para o Node.js.
+
+```zsh
+npm install -D -E @types/node@16.18.23
+
+```
+
+Em seguida, vamos criar dois arquivos: um chamado (index.ts), que usaremos para testar o nosso módulo, e um chamado (exercises.ts), onde faremos a implementação do nosso módulo com algumas funções.
+
+```zsh
+touch index.ts && touch exercises.ts
+
+```
+
+### Implementação
+
+Agora que já está tudo configurado, iniciaremos a implementação das funções. Primeiro, desenvolveremos uma função para calcular a área de um quadrado. A fórmula para o cálculo é elevar a medida de qualquer um dos lados ao quadrado. (A = s²)
+
+![quadrado](https://content-assets.betrybe.com/prod/846a1764-9dbe-4b7e-b79c-a6961c6a839c-%C3%81rea%20do%20quadrado.png)
+
+```javascript
+// ./exercises.ts
+
+export function getSquareArea(side: number): number {
+  return side ** 2;
+}
+
+```
+A segunda função calculará a área de um retângulo. A fórmula para o cálculo é multiplicar a medida da base pela medida da altura. (A = b * h)
+
+![retangulo](https://content-assets.betrybe.com/prod/846a1764-9dbe-4b7e-b79c-a6961c6a839c-%C3%81rea%20do%20ret%C3%A2ngulo.png)
+
+```javascript
+// ./exercises.ts
+
+// export function getSquareArea(side: number): number {
+//   return side ** 2;
+// }
+
+export function getRectangleArea(base: number, height: number): number {
+  return base * height;
+}
+
+```
