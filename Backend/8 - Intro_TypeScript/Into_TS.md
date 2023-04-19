@@ -92,11 +92,12 @@ A tipagem fraca tem a característica da linguagem de realizar conversões autom
 
 ![typescript](https://content-assets.betrybe.com/prod/Imagem%20que%20demonstra%20a%20tipagem%20do%20TypeScript.png)
 
-Tipagem	/ Significado
-Estática	/ Não permite que a pessoa desenvolvedora altere o tipo após ele ser declarado.
-Dinâmica	/ A linguagem de programação “escolhe” o tipo de dado a partir do valor atribuído à variável em tempo de execução.
-Fraca	/ Tipagem fraca tem a característica da linguagem realizar conversões automáticas entre tipos diferentes de dados.
-Forte	/ Linguagens fortemente tipadas não realizam conversões automaticamente.
+Tipagem	 | Significado
+---------|------------
+Estática | Não permite que a pessoa desenvolvedora altere o tipo após ele ser declarado.
+Dinâmica | A linguagem de programação “escolhe” o tipo de dado a partir do valor atribuído à variável em tempo de execução.
+Fraca    | Tipagem fraca tem a característica da linguagem realizar conversões automáticas entre tipos diferentes de dados.
+Forte    | Linguagens fortemente tipadas não realizam conversões automaticamente.
 
 ## Inferência de tipo:
 
@@ -289,3 +290,8 @@ E do lado direito temos:
 - A guia *Erros* que exibe erros de sintaxe identificados pelo TypeScript;
 - A guia *Logs* que mostra o resultado da execução do código, realizado pelo botão **Run**.
 
+## Tipos e Subtipos
+
+Vamos falar um pouco mais sobre o grande recurso do **TypeScript** em relação ao **JavaScript**: os tipos.
+
+Em **TypeScript**, todos os tipos são subtipos de um tipo principal chamado [any], e este é um tipo que pode representar qualquer valor em **JavaScript**. Os demais tipos são os tipos primitivos, tipos de objeto ou parâmetros de tipo.
