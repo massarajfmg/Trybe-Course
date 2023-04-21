@@ -548,7 +548,7 @@ Preencha o arquivo `tsconfig.json` com algumas configurações iniciais:
 
 Iniciaremos vendo como a lib `mysql2` utiliza o recurso de Generics em seus métodos. Para isso, vamos começar implementando nosso arquivo `connection.ts.`
 
-> **Observação**: Lembre-se de criar o arquivo `.env` com os valores das variáveis de ambiente utilizadas no arquivo `models/connection.ts` e de instalar a biblioteca `mysql2` com `npm install mysql2@2.3`. Use esse [conteúdo](https://app.betrybe.com/learn/course/5e938f69-6e32-43b3-9685-c936530fd326/module/94d0e996-1827-4fbc-bc24-c99fb592925b/section/2ed87e4f-9049-4314-8091-8f71b1925cf6/day/6b700197-22c6-4a2d-b791-b66d5247d3f0/lesson/aa97630a-167e-456b-b18f-bdc3019202b5) para lembrar como atribuir os valores correspondentes às variáveis de ambiente utilizadas pelo arquivo exemplificado abaixo.
+> **Observação**: Lembre-se de criar o arquivo `.env` com os valores das variáveis de ambiente utilizadas no arquivo `models/connection.ts` e de instalar a biblioteca `mysql2` com `npm install mysql2@2.3`. Use esse ![conteúdo](https://app.betrybe.com/learn/course/5e938f69-6e32-43b3-9685-c936530fd326/module/94d0e996-1827-4fbc-bc24-c99fb592925b/section/2ed87e4f-9049-4314-8091-8f71b1925cf6/day/6b700197-22c6-4a2d-b791-b66d5247d3f0/lesson/aa97630a-167e-456b-b18f-bdc3019202b5) para lembrar como atribuir os valores correspondentes às variáveis de ambiente utilizadas pelo arquivo exemplificado abaixo.
 
 ```javascript
 // ./models/connection.ts
