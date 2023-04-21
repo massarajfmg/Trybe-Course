@@ -493,193 +493,394 @@ Vamos agora colocar os aprendizados em prática e ver como podemos usar *Type As
 
 Para esse projeto, vamos usar um banco de dados MySQL para gerenciar uma lista de livros. Crie o banco usando o SQL abaixo (caso precise lembrar como criar um banco de dados a partir de uma *query* SQL acesse esse [conteúdo] (https://app.betrybe.com/learn/course/5e938f69-6e32-43b3-9685-c936530fd326/module/94d0e996-1827-4fbc-bc24-c99fb592925b/section/2ed87e4f-9049-4314-8091-8f71b1925cf6/day/6b700197-22c6-4a2d-b791-b66d5247d3f0/lesson/d55e780a-a5a4-44a4-8d83-d73a2c99c691)):
 
+```javascript
+CREATE DATABASE IF NOT EXISTS books_api;
+
+USE books_api;
+
+CREATE TABLE IF NOT EXISTS books
+(
+  id INT NOT NULL AUTO_INCREMENT,
+  title VARCHAR(30) NOT NULL,
+  price DECIMAL(10, 2),
+  author VARCHAR(100) NOT NULL,
+  isbn VARCHAR(100),
+  PRIMARY KEY(id)
+);
+
+INSERT INTO books (title, price, author, isbn)
+VALUES ('Código Limpo', 125.9, 'Robert C Martin', '8576082675'),
+  ('Refatoração', 129.9, 'Martin Fowler', '8575227246'),
+  ('Padrões de Projetos', 141.98, 'Erich Gamma', '8573076100');
+
+```
+
+## Configuração inicial do projeto
+
+Execute os comandos abaixo para criar a base para um novo projeto em TypeScript:
+
 ```zsh
-npm i express@4.17.1 mysql2@2.3.3 --save-exact
+mkdir ts-with-mysql && cd ts-with-mysql 
+npm init -y
+npm install -D -E typescript@4.4.4 @tsconfig/node16@1.0.3 @types/node@16.18.23
+touch tsconfig.json
 ```
 
-A novidade aqui está no módulo (ou drive) **mysql2**, responsável por permitir que uma aplicação **Node.js** consiga comunicar-se com o MySQL. Comumente chamamos esse tipo de biblioteca (que permite nossa aplicação conversar com banco de dados) de **client**, o qual possui todo o código necessário para enviarmos comandos SQL para o nosso banco de dados, no caso o MySQL, e recebermos as respostas dos comandos enviados.
-
-Precisaremos criar em nossa aplicação o arquivo `src/db/connection.js`, que será responsável por realizar a conexão com o servidor MySQL utilizando a biblioteca `mysql2`:
+Preencha o arquivo `tsconfig.json` com algumas configurações iniciais:
 
 ```javascript
-// src/db/connection.js
-
-const mysql = require('mysql2/promise');
-
-const connection = mysql.createPool({
-  host: 'localhost',
-  port: 33060,
-  user: 'root',
-  password: 'root',
-  database: 'trybecashdb',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
-
-module.exports = connection;
-```
-
-No trecho de código acima estamos importando a biblioteca **mysql2** com o recurso de `promises`. Isso permitirá utilizar o MySQL de forma assíncrona com **async/await**. Em seguida, criamos uma constante `connection` que recebe um `pool de conexões` criado com a função **createPool**.
-
-Um `pool de conexões` é um repositório que contém um conjunto de conexões estabelecidas previamente com o banco de dados. Essas conexões serão reutilizadas durante a execução da aplicação conforme a necessidade. Em outras palavras, quando uma operação no banco de dados for necessária nossa aplicação irá:
-
- 1. Requisitar uma conexão no pool de conexões;
- 2. Utilizar essa conexão para enviar uma operação SQL ao servidor MySQL;
- 3. Devolver a conexão para o pool de conexões ao final da operação com o MySQL;
- 4. Tornar a conexão disponível para ser utilizada em requisições futuras.
-
-O diagrama abaixo mostra de forma visual a interação entre uma aplicação Node.js, o pool de conexões e o servidor MySQL.
-
-![Diagrama de interação entre Node.js, o pool de conexões e o servidor MySQL](https://content-assets.betrybe.com/prod/Diagrama%20de%20intera%C3%A7%C3%A3o%20entre%20Nodejs%20o%20pool%20de%20conex%C3%B5es%20e%20o%20servidor%20MySQL.png)
-
-O uso do `pool` de conexões é encorajado, pois sem ele, para cada operação com o *MySQL* uma conexão seria aberta e, após seu uso, seria fechada. Assim, seria necessário abrir novamente uma nova conexão com o *MySQL* para executar uma nova operação. E abrir uma nova conexão com o *MySQL* demanda tempo, adicionando um atraso para cada requisição da *API* como consequência.
-
-Logo, o uso de um `pool` de conexões acelera o processo de execução de consultas no *MySQL*, pois reutiliza as conexões em operações futuras, não precisando criar uma nova conexão a cada operação.
-
-A função **createPool** recebe um objeto com os seguintes parâmetros:
-
-**Parâmetro** | **Descrição** | **Observações**
---------------|---------------|-----------------
-**host** | O endereço IP do MySQL |	Como temos um container `docker` sendo executado em nossa máquina local, o valor será **localhost** ou **127.0.0.1** (ambos são equivalentes)
-**user** | O nome de usuário que nossa aplicação utilizará para acessar o *MySQL* |	Estamos utilizando o usuário **root** do *MySQL*
-**port** | O número da porta que nossa aplicação utilizará para acessar o *MySQL* |	Estamos utilizando a porta 33060 (a porta do computador local que vinculamos com o container no `docker compose`)
-**password** | A senha do usuário que nossa aplicação utilizará para acessar o *MySQL* | Estamos utilizando a senha **root** que foi definida na variável de ambiente **MYSQL_ROOT_PASSWORD** no `docker compose` criado anteriormente
-**database** | O nome do banco de dados *MySQL*, o qual queremos que nossa aplicação realize uma conexão | Estamos utilizando o nome do banco que foi definido na variável de ambiente **MYSQL_DATABASE** no `docker compose`
-**waitForConnections** | Determina qual será a ação da `pool` de conexões quando nenhuma conexão estiver disponível na `pool` e quando o limite de criação de novas conexões tiver sido alcançado | Se o valor for `true`, será criada uma fila de espera por conexões, caso contrário a `pool` retornará uma *callback* com um erro. Caso este parâmetro seja omitido, o valor padrão será **true**
-**connectionLimit** | O número máximo de requisições de conexão que a `pool` criará de uma vez | Caso este parâmetro seja omitido, o valor padrão será **10**
-**queueLimit** | O número máximo de requisições de conexão que a `pool` irá enfileirar antes de retornar um erro |  Se o valor deste parâmetro for igual a **0** significa que não existe limite. Caso este parâmetro seja omitido, o valor padrão será **0**
-
-Agora que o conceito de `pool` de conexões foi explicado e o arquivo `connection.js` foi criado, está na hora de configurarmos o `express` no projeto e testarmos se ele consegue se comunicar com o MySQL. Para isso, vamos criar o arquivo `src/app.js` com o seguinte conteúdo:
-
-```javascript
-// src/app.js
-
-const express = require('express');
-
-const app = express();
-
-app.use(express.json());
-
-module.exports = app;
-```
-
-No código acima estamos criando as definições do `express`. Vale ressaltar que a função `app.listen()` não está sendo executada no arquivo `src/app.js`. Contudo, estamos realizando um `module.exports` na constante `app` que inicializa o express e registra os `middlewares` que serão utilizados inicialmente.
-
-A razão disso é que quando formos escrever nossos testes de integração, a definição de inicialização, rotas e `middlewares` do express, devem estar separadas da inicialização dele. Isso nos permitirá criar um `mock` das nossas rotas facilitando o processo de testar nossa API.
-
-🤔 Você deve estar se perguntando: *“onde realizaremos a chamada da função `app.listen()` necessária para inicializar o express?”* Nesse ponto entra o nosso arquivo `src/server.js`, no qual adicionaremos o seguinte conteúdo:
-
-```javascript
-// src/server.js
-const app = require('./app');
-const connection = require('./db/connection');
-
-const PORT = 3001;
-
-app.listen(PORT, async () => {
-  console.log(`API TrybeCash está sendo executada na porta ${PORT}`);
-
-  // O código abaixo é para testarmos a comunicação com o MySQL
-  const [result] = await connection.execute('SELECT 1');
-  if (result) {
-    console.log('MySQL connection OK');
+// ./tsconfig.json
+{
+  "extends": "@tsconfig/node16/tsconfig.json",
+  "compilerOptions": {
+    "target": "es2016",                                 
+    "module": "commonjs",
+    "rootDir": "./",
+    "outDir": "./dist",
+    "preserveConstEnums": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
   }
+}
+```
+
+Iniciaremos vendo como a lib `mysql2` utiliza o recurso de Generics em seus métodos. Para isso, vamos começar implementando nosso arquivo `connection.ts.`
+
+> **Observação**: Lembre-se de criar o arquivo `.env` com os valores das variáveis de ambiente utilizadas no arquivo `models/connection.ts` e de instalar a biblioteca `mysql2` com `npm install mysql2@2.3`. Use esse [conteúdo](https://app.betrybe.com/learn/course/5e938f69-6e32-43b3-9685-c936530fd326/module/94d0e996-1827-4fbc-bc24-c99fb592925b/section/2ed87e4f-9049-4314-8091-8f71b1925cf6/day/6b700197-22c6-4a2d-b791-b66d5247d3f0/lesson/aa97630a-167e-456b-b18f-bdc3019202b5) para lembrar como atribuir os valores correspondentes às variáveis de ambiente utilizadas pelo arquivo exemplificado abaixo.
+
+```javascript
+// ./models/connection.ts
+
+import mysql from 'mysql2/promise';
+
+export default mysql.createPool({
+  host: process.env.DB_HOSTNAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
 });
 ```
 
-Acima, criamos uma constante `app` que importa o que foi definido no arquivo `src/app.js` e, a partir dessa constante, iniciamos o nosso express executando a função `app.listen().`
-
-Dentro da função `app.listen()` foi adicionado um trecho de código que executa a função `connection.execute()`, que recebe como parâmetro uma consulta SQL `SELECT 1`. Essa função realiza uma conexão com o MySQL, executa o SQL passado como parâmetro e recebe uma resposta que é armazenada na constante `result` (note que o processo de desestruturação de variáveis está sendo utilizado! 😎).
-
-Depois é verificado com um if se o objeto `result` contém alguma coisa e, em caso de positivo, é impresso no console a mensagem `MySQL connection OK`. Se você for no console e executar o comando `npm start`, o `express` será iniciado e apresentará a seguinte saída:
-
-![Saída esperada ao inicializar o projeto.](https://content-assets.betrybe.com/prod/Sa%C3%ADda%20esperada%20ao%20inicializar%20o%20projeto.png)
-
-Se você obteve na saída do terminal a mensagem `MySQL connection OK`, saiba que acabou de realizar a sua primeira conexão com o MySQL por meio do **Express**! Parabéns! 🎉 🥳 🎉
-
-Pode parecer pouca coisa, mas não é! Você realizou toda a configuração necessária para que isso fosse possível e, a partir desse ponto, podemos criar funcionalidades mais complexas utilizando comandos SQL mais robustos!
-
-Antes de avançarmos, vamos `refatorar` nosso arquivo `src/server.js` para retirar o código que utilizamos para testar se a comunicação com o MySQL estava ocorrendo, pois esse código não será mais útil para nós de agora em diante. O arquivo deverá estar assim:
+Agora, vamos ver como a função `connection.execute` que usamos para executar queries usa o recurso de Generics. Ao olhar para a sua definição podemos encontrar a seguinte assinatura:
 
 ```javascript
-// src/server.js
-
-const app = require('./app');
-
-const PORT = 3001;
-
-app.listen(PORT, () => {
-  console.log(`API TrybeCash está sendo executada na porta ${PORT}`);
-});
+execute<
+    T extends RowDataPacket[][] | RowDataPacket[] | OkPacket | OkPacket[] | ResultSetHeader
+  >(
+    sql: string,
+    values: any | any[] | { [param: string]: any }
+  ): Promise<[T, FieldPacket[]]>;
 ```
 
-E nesse ponto teremos a seguinte estrutura de arquivos e diretórios no projeto:
+Vamos nos concentrar no generic utilizado na definição da função. O método `execute` pode receber qualquer tipo que estenda uma das seguintes interfaces:
 
-```
-.
-└── trybecash-api/
-    ├── src/
-    │   ├── db/
-    │   │   └── connection.js
-    │   ├── app.js
-    │   └── server.js
-    ├── tests/
-    │   └── -
-    ├── docker-compose.yaml
-    ├── Dockerfile
-    ├── package.json
-    └── trybecash_script.sql
+ - RowDataPacket[][]
+ - RowDataPacket[]
+ - OkPacket
+ - OkPacket[]
+ - ResultSetHeader
 
-```
+Perceba que se quisermos atribuir um tipo genérico `T` a algum resultado de consulta, esse `T` precisará ser (ou herdar) algum dos 3 tipos esperados na assinatura do execute: `RowDataPacket`, `OkPacket` ou `ResultSetHeader`.
 
-E agora, a incrível produção cinematográfica Trybe Missions está de volta, dessa vez migrando os dados das missões para o MySQL utilizando Docker! 🚀
-
-`Video do Course`
-
-Caso queira, você pode ver o código SQL utilizado no `Trybe Missions` logo abaixo! 😉
+A título de exemplo, vamos fazer o seguinte trecho de código:
 
 ```javascript
-DROP DATABASE IF EXISTS trybestrelar;
 
-CREATE DATABASE trybestrelar;
+// ./main.ts
 
-USE trybestrelar;
+import connection from './models/connection';
 
-CREATE TABLE
-    missions (
-        id INT NOT NULL AUTO_INCREMENT,
-        name VARCHAR(90) NOT NULL,
-        year VARCHAR(45) NOT NULL,
-        country VARCHAR(90) NOT NULL,
-        destination VARCHAR(90) NOT NULL,
-        PRIMARY KEY(id)
+const main = async () => {
+  const result = await connection.execute('SELECT * FROM books');
+  const [rows] = result;
+  console.log(rows);
+};
+
+main();
+
+```
+
+Note que mesmo sem especificar nenhuma tipagem, o TypeScript não reclama do código. Isso acontece, pois para todos os tipos possíveis de retorno para `connection.execute`, por padrão, pode-se extrair um elemento do array.
+
+Agora, vamos ver o que aconteceria se você tentasse fazer uma query do tipo `INSERT` e extrair o `insertId`:
+
+Observação: Para executar o exemplo a seguir instale a biblioteca `readline-sync`.
+
+```zsh
+npm i readline-sync@1.4 @types/readline-sync@1.4
+
+```
+
+```javascript
+// ./execute.insert.ts
+
+import readline from 'readline-sync';
+import connection from './models/connection';
+
+const main = async () => {
+  const title = readline.question('Digite o nome do livro: ');
+  const price = readline.questionFloat('Digite o preço do livro: ');
+  const author = readline.question('Digite o autor do livro: ');
+  const isbn = readline.question('Digite o isbn do livro: ');
+
+  const [{ insertId }] = await connection.execute(
+    'INSERT INTO books (title, price, author, isbn) VALUES (?, ?, ?, ?)',
+    [title, price, author, isbn]
+  );
+  console.log(insertId);
+};
+
+main();
+```
+
+Você vai perceber que seu código não pode ser compilado, pois o TypeScript não consegue identificar a origem do atributo `insertId`. O erro encontrado será:
+
+> Property ‘insertId’ does not exist on type ‘RowDataPacket[] | RowDataPacket[][] | OkPacket | OkPacket[] | ResultSetHeader’.
+
+Porém na própria lib `mysql2` temos uma interface que possui esse atributo, que é `ResultSetHeader`. Ao passar essa interface como generic para `connection.execute`, você vai perceber que a linha que extrai o atributo `insertId` passa a ser compilável.
+
+```javascript
+// ./execute.insert.ts
+
+// import readline from  'readline-sync';
+import { ResultSetHeader } from 'mysql2';
+// import connection  from './models/connection';
+
+// const main = async () => {
+//   const title = readline.question('Digite o nome do livro: ');
+//   const price = readline.questionFloat('Digite o preço do livro: ');
+//   const author = readline.question('Digite o autor do livro: ');
+//   const isbn = readline.question('Digite o isbn do livro: ');
+
+const [{ insertId }] = await connection.execute<ResultSetHeader>(
+  'INSERT INTO books (title, price, author, isbn) VALUES (?, ?, ?, ?)',
+  [title, price, author, isbn]
+); // essa linha não acusa mais erro de compilação.
+//  console.log(insertId);
+// }
+//
+// main();
+```
+
+Este é um primeiro exemplo do uso de Generics no dia a dia que já podemos encontrar. Com base nisso, vamos implementar nosso modelo.
+
+## Implementando um model como uma classe
+
+Para este exemplo, criaremos nosso modelo como uma classe que vai possuir o atributo `connection`. Esta classe também terá o método `getAll` que irá retornar o resultados da query.
+
+```javascript
+// ./models/Book.ts
+
+import { Pool } from 'mysql2/promise';
+import connection from './connection';
+
+export default class BookModel {
+  connection: Pool;
+
+  constructor() {
+    this.connection = connection;
+  }
+
+  async getAll() {
+    const result = await this.connection.execute('SELECT * FROM books');
+    const [rows] = result;
+    return rows;
+  }
+}
+```
+
+Dessa forma, podemos usar esse modelo para ser nossa fonte de acesso aos dados. Vamos instanciar um objeto dessa classe e chamá-lo no nosso arquivo `main.ts`.
+
+```javascript
+// ./main.ts
+
+import BookModel from './models/Book';
+
+const main = async () => {
+  const bookModel = new BookModel();
+
+  const books = await bookModel.getAll();
+  console.log(books);
+};
+
+main();
+```
+
+Apesar do código acima retornar resultados, não temos uma previsibilidade sobre o tipo desses dados. Para resolver isso podemos tentar aplicar duas formas de tipagens que já aprendemos: *Type Assertions e Generics*. Ambas as formas devem atender nosso objetivo que é mapear as propriedades do resultado que a query trará. Mas antes, vamos começar definindo uma interface que represente a entidade `Book` e que poderá ser utilizado em ambas alternativas de tipagem.
+
+```javascript
+// ./models/Book.ts
+
+// import { Pool } from 'mysql2/promise';
+// import connection from './connection';
+
+export interface Book {
+  id?: number;
+  title: string;
+  price: number;
+  author: string;
+  isbn: string;
+}
+
+// export default class BookModel {
+//   connection: Pool;
+
+//   constructor(){
+//     this.connection = connection;
+//   }
+
+//   async getAll() {
+//     const result = await this.connection.execute('SELECT * FROM books');
+//     const [rows] = result;
+//     return rows;
+//   }
+// }
+```
+
+Agora que já temos a interface, vamos precisar dizer ao Typescript que a nossa variável `rows` conterá um array de `Books` e para isso vamos usar *Type Assertions*. Podemos fazer da seguinte forma:
+
+```javascript
+// ./models/Book.ts
+
+// import { Pool } from 'mysql2/promise';
+// import connection from './connection';
+
+// export interface Book {
+//   id?: number,
+//   title: string,
+//   price: number,
+//   author: string,
+//   isbn: string,
+// }
+
+export default class BookModel {
+//   connection: Pool;
+
+//   constructor(){
+//     this.connection = connection;
+//   }
+
+  async getAll(): Promise<Book[]> {
+    const result = await this.connection.execute('SELECT * FROM books');
+    const [rows] = result;
+    return rows as Book[];
+  }
+}
+```
+
+Note que com essa estratégia conseguimos informar a qualquer função que utilizar o `getAll` que o resultado que será obtido no retorno será um array com a estrutura da interface `Books`.
+
+Agora, como uma alternativa a *Type Assertions*, vamos tentar tipar utilizando o recurso *Generics*, e como foi comentado acima na parte da assinatura do método `execute`, para conseguir informar o tipo de retorno pelo parâmetro genérico é necessário enviar um tipo que herde pelo menos uma das três interfaces esperadas.
+
+Trazendo para nosso cenário, se quisermos mapear o resultado da `query` para que tenha as propriedades da interface `Book`, então devemos enviar como parâmetro a interface `Book`, herdando o tipo `RowDataPacket` que é a interface genérica que devemos utilizar quando realizamos queries de `SELECT`. A tipagem ficará assim:
+
+```javascript
+// ./models/Book.ts
+
+import { Pool, RowDataPacket } from 'mysql2/promise';
+// import connection from './connection';
+
+// export interface Book {
+//   id?: number,
+//   title: string,
+//   price: number,
+//   author: string,
+//   isbn: string,
+// }
+
+export default class BookModel {
+  // connection: Pool;
+
+  // constructor(){
+  //   this.connection = connection;
+  // }
+
+  async getAll(): Promise<Book[]> {
+    const [rows] = await this.connection.execute<(Book & RowDataPacket)[]>(
+      'SELECT * FROM books');
+
+    return rows;
+  }
+}
+```
+
+Note que utilizando `Generics` nós conseguimos realizar a tipagem de maneira antecipada. Na mesma linha onde chamamos o execute já é possível saber todas as propriedades da variável `rows`. Já no *Type Assertion*, tivemos que desestruturar o array para conseguir atribuir o tipo. Mas vale reforçar que, para esse caso, ambas as alternativas são válidas pois atendem nosso objetivo.
+
+## Método create
+
+Vamos implementar agora o método `create` com base no que vimos anteriormente.
+
+```javascript
+// ./models/Book.ts
+
+import { Pool, RowDataPacket, ResultSetHeader } from 'mysql2/promise';
+// import connection from './connection';
+
+// export interface Book {
+//   id?: number,
+//   title: string,
+//   price: number,
+//   author: string,
+//   isbn: string,
+// }
+
+// export default class BookModel {
+
+// connection: Pool;
+
+// constructor(){
+//   this.connection = connection;
+// }
+
+//   async getAll(): Promise<Book[]> {
+//     const [rows] = await this.connection.execute<(Book & RowDataPacket)[]>('SELECT * FROM books');
+
+//     return rows;
+//   }
+
+  async create(book: Book): Promise<Book> {
+    const { title, price, author, isbn } = book;
+
+    const [{ insertId }] = await this.connection.execute<ResultSetHeader>(
+        'INSERT INTO books (title, price, author, isbn) VALUES (?, ?, ?, ?)',
+        [title, price, author, isbn],
     );
 
-INSERT INTO missions 
-    (`id`,`name`,`year`,`country`,`destination`) 
-VALUES 
-    (1,'Mariner 2','1962','Estados Unidos','Vênus'),
-    (2,'Venera 4','1967','URSS','Vênus'),
-    (3,'Mariner 5','1967','Estados Unidos','Vênus'),
-    (4,'Apollo 11','1969','Estados Unidos','Lua'),
-    (5,'Mariner 10','1973','Estados Unidos','Mercúrio e Vênus'),
-    (6,'Voyager 1','1977','Estados Unidos','Espaço interestelar'),
-    (7,'Venera 16','1983','URSS','Vênus'),
-    (8,'Phobos 1','1988','URSS','Marte'),
-    (9,'Phobos 2','1988','URSS','Marte'),
-    (10,'Galileo','1989','Estados Unidos','Júpiter'),
-    (11,'Mars Pathfinder','1996','Estados Unidos','Marte'),
-    (12,'Cassini-Huygens','1997','Estados Unidos e Europa','Saturno'),
-    (13,'Nozomi (Planeta B)','1998','Japão','Marte'),
-    (14,'Estação Internacional Espacial','1998','Estados Unidos e Rússia','Órbita terrestre'),
-    (15,'Mars Polar Lander','1999','Estados Unidos','Marte'),
-    (16,'2001 Mars Odyssey','2001','Estados Unidos','Marte'),
-    (17,'Genesis','2001','Estados Unidos','Terra'),
-    (18,'MESSENGER','2004','Estados Unidos','Mercúrio'),
-    (19,'Telescópio Espacial Kepler','2009','Estados Unidos','Espaço interestelar'),
-    (20,'Telescópio Espacial James Webb','2021','Estados Unidos, União Europeia e Canadá','Espaço interestelar');
+    return { id: insertId, ...book };
+  }
+
+// }
 
 ```
 
+Perceba que recebemos um objeto do tipo `Book` como parâmetro e usamos essa informação para salvar os valores no banco.
 
+Podemos usar o código abaixo para ler valores e cadastrar um livro através do método `create` do nosso modelo.
+
+```javascript
+// ./main.ts
+
+import readline from 'readline-sync';
+
+import BookModel, { Book } from './models/Book';
+
+const main = async () => {
+  const bookModel = new BookModel();
+
+  const title = readline.question('Digite o título do livro: ');
+  const price = readline.questionFloat('Digite o preço do livro: ');
+  const author = readline.question('Digite o autor do livro: ');
+  const isbn = readline.question('Digite o isbn do livro: ');
+
+  const newBook: Book = { title, price, author, isbn };
+
+  const createdBook = await bookModel.create(newBook);
+  console.log(createdBook);
+};
+
+main();
+```
+
+Com isso temos um primeiro modelo criado.
