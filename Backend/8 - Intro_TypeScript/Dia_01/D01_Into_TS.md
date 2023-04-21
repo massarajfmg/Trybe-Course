@@ -1,3 +1,5 @@
+# Dia 01
+
 # Introdução - TypeScript
 
 ## O que vamos aprender?
@@ -623,7 +625,7 @@ VERIFICA A EXISTÊNCIA DE TRIÂNGULOS CUJOS LADOS TÊM:
 
 E agora, o que acha de colocar a mão na massa e incrementar mais esse nosso módulo de cálculo de área de figuras geométricas?
 
-1 - Crie uma nova função para calcular a área de um losango. A área do losango é dada pelo resultado da multiplicação da diagonal maior (D) pela diagonal menor (d) dividido por dois. (A = (D * d) / 2)
+1. Crie uma nova função para calcular a área de um losango. A área do losango é dada pelo resultado da multiplicação da diagonal maior (D) pela diagonal menor (d) dividido por dois. (A = (D * d) / 2)
 
 ![losango](https://content-assets.betrybe.com/prod/8d8210c9-f4e8-4697-95b7-19b673037fa6-%C3%81rea%20do%20Losango.png)
 
@@ -631,7 +633,7 @@ E agora, o que acha de colocar a mão na massa e incrementar mais esse nosso mó
 - Calcule a área de um losango que tem D = 200cm e d = 50cm;
 - Calcule a área de um losango que tem D = 75cm e d = 25cm.
 
-2 - Crie uma nova função para calcular a área de um trapézio. A área do trapézio é dada pelo produto da altura (h) com a soma da base maior (B) e a base menor (b) dividido por dois. (A = [(B + b) * h] / 2)
+2. Crie uma nova função para calcular a área de um trapézio. A área do trapézio é dada pelo produto da altura (h) com a soma da base maior (B) e a base menor (b) dividido por dois. (A = [(B + b) * h] / 2)
 
 ![trapezio](https://content-assets.betrybe.com/prod/8d8210c9-f4e8-4697-95b7-19b673037fa6-%C3%81rea%20do%20Trap%C3%A9zio.png)
 
@@ -639,7 +641,7 @@ E agora, o que acha de colocar a mão na massa e incrementar mais esse nosso mó
 - Calcule a área de um trapézio que tem B = 75cm, b = 50cm e altura = 35cm;
 - Calcule a área de um trapézio que tem B = 150cm, b = 120cm e altura = 80cm.
 
-3 - Crie uma nova função para calcular a área de um círculo. A área do círculo de raio (r) é calculada multiplicando o raio ao quadrado pelo número irracional ℼ (em geral utilizamos ℼ = 3,14). (A = ℼ * r²). Dica: você pode acessar o valor de ℼ utilizando o módulo nativo (Math.PI).
+3. Crie uma nova função para calcular a área de um círculo. A área do círculo de raio (r) é calculada multiplicando o raio ao quadrado pelo número irracional ℼ (em geral utilizamos ℼ = 3,14). (A = ℼ * r²). Dica: você pode acessar o valor de ℼ utilizando o módulo nativo (Math.PI).
 
 ![circulo](https://content-assets.betrybe.com/prod/8d8210c9-f4e8-4697-95b7-19b673037fa6-%C3%81rea%20do%20C%C3%ADrculo.png)
 
